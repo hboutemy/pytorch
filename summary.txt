@@ -1,6 +1,6 @@
-      73 whl/simple
-      46 whl/cpu/simple
-      42 whl/cu111/simple
-      57 whl/cu118/simple
-      59 whl/cu124/simple
-      43 whl/rocm6.1/simple
+73 whl/simple
+46 whl/cpu/simple
+42 whl/cu111/simple
+57 whl/cu118/simple
+59 whl/cu124/simple
+43 whl/rocm6.1/simple
