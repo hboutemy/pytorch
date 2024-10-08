@@ -7,20 +7,37 @@ do
   mkdir -p $d/simple
   dir="$(pwd)"
   cd $d/simple
-  wget -q https://download.pytorch.org/$d/
+  curl -s https://download.pytorch.org/$d/ | grep -v 'TIMESTAMP 1' > index.html
+  count="$(cat index.html | cut -d '>' -f 2 | cut -d '<' -f 1 | grep -cve '^\s*$')"
 
-  echo "https://download.pytorch.org/$d/ $(cat index.html | cut -d '>' -f 2 | cut -d '<' -f 1 | grep -cve '^\s*$') => $d/simple/"
+  echo "https://download.pytorch.org/$d/ $count => $d/simple/"
+  if [ $count -lt 40 ]
+  then
+    echo "failing because low packages count for $d: $count (intermittent download failure?)"
+    exit 1
+  fi
+
   i=0
   for p in `cat index.html | cut -d '>' -f 2 | cut -d '<' -f 1`
   do
     mkdir $p
     cd $p
     ((i++))
-    echo "$i                             $d/$p/ => $d/simple/$p/"
-    wget -q https://download.pytorch.org/$d/$p/
-    sed -i 's_href="/whl_href="https://download.pytorch.org/whl_' index.html
+    curl -s https://download.pytorch.org/$d/$p/ \
+      | sed -e 's_href="/whl_href="https://download.pytorch.org/whl_' \
+      | grep -v 'TIMESTAMP 1' \
+      > index.html
+
+    count="$(cat index.html | grep -c 'https://download.pytorch.org/whl/')"
+    echo "$i                            $d/$p/ => $d/simple/$p/ $count"
+    if [ $count -lt 1 ]
+    then
+      echo "failing because low packages count for $d/$p: $count (intermittent download failure?)"
+      exit 1
+    fi
     cd ..
   done
+  echo
   cd "$dir"
 done
 
