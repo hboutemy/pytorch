@@ -25,3 +25,6 @@ do
 done
 
 du -sh whl/*
+
+for d in whl/simple whl/*/simple ; do echo "$(ls $d | wc -l) $d" ; done > summary.txt
+cat summary.txt
